@@ -58,8 +58,7 @@ static void stop_input_hook();
 static struct work_struct stop_vfs_read_work;
 static struct work_struct stop_execve_hook_work;
 static struct work_struct stop_input_hook_work;
-#endif
-
+#else
 bool ksu_vfs_read_hook __read_mostly = true;
 bool ksu_execveat_hook __read_mostly = true;
 bool ksu_input_hook __read_mostly = true;
@@ -68,6 +67,7 @@ bool ksu_input_hook __read_mostly = true;
 bool ksu_devpts_hook = false;
 bool susfs_is_sus_su_ready = false;
 #endif // #ifdef CONFIG_KSU_SUSFS_SUS_SU
+#endif
 
 u32 ksu_devpts_sid;
 
@@ -492,10 +492,12 @@ __maybe_unused int ksu_handle_execve_ksud(const char __user *filename_user,
 	struct filename filename_in, *filename_p;
 	char path[32];
 
+#ifndef CONFIG_KSU_KPROBES_HOOK
 	// return early if disabled.
 	if (!ksu_execveat_hook) {
 		return 0;
 	}
+#endif
 
 	if (!filename_user)
 		return 0;
